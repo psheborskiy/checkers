@@ -1,0 +1,49 @@
+body
+  display: grid
+  grid-template-rows: 1fr
+
+main
+  display: grid
+  grid-template-columns: 70% 
+  justify-content: center
+  height: 90vh
+
+  h1
+    text-align: center
+
+.white
+  background-color: white
+
+.black
+  background-color: #383131
+
+.board
+  display: grid
+  grid-template-columns: 0.5fr repeat(8, 1fr)
+  grid-template-rows: repeat(8, 1fr) 0.5fr
+  height: 68vw
+  align-items: center
+  justify-items: center
+
+  .item
+    border: #000 2px solid
+    height: 100%
+    width: 100%
+    display: flex
+    align-items: center
+    justify-content: center
+
+    .checker
+      height: 80%
+      width: 80%
+      border-radius: 50%
+      display: inline-block
+      cursor: pointer
+
+      &-black
+        background-color: black
+        box-shadow: 2px 2px 1px 0px #423d3da8
+
+      &-white
+        background-color: white
+        box-shadow: 2px 2px 1px 0px #6a6a6aa8
