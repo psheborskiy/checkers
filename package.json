@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npm run test",
     "start": "webpack --config webpack.common.js",
-    "build": " webpack --config webpack.common.js"
+    "build": " webpack --config webpack.common.js",
+    "react-devtools": "react-devtools"
   },
   "keywords": [
     "game",

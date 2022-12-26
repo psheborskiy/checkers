@@ -1,12 +1,21 @@
 import React from "react";
-import { CheckerType } from "../types/checer.type";
+import { CheckerType, IChecker } from "../types/checker.type";
 
 type Props = {
-  type: number;
+  color: CheckerType;
+  board: IChecker[][],
+  onCheckerClick: any
 };
 
-const Checker = ({type}: Props) => {
-  return <span className={`checker ${type === CheckerType.Black ? "checker-black" : "checker-white"}`}></span>
+const Checker = ({color, board, onCheckerClick}: Props) => {
+
+  const canMove = () => {
+    return true;
+  }
+
+  return <span 
+  onClick={onCheckerClick}
+  className={`checker ${color === CheckerType.Black ? "checker-black" : "checker-white"}`}></span>
 }
 
 export default Checker;
