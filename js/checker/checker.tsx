@@ -1,15 +1,15 @@
 import React from "react";
-import { CheckerType, IChecker } from "../types/checker.type";
+import { CheckerColor, IChecker } from "../types/checker.type";
 
 type Props = {
-  color: CheckerType;
+  color: CheckerColor;
 };
 
 const Checker = ({ color }: Props) => {
   return (
     <span
       className={`checker ${
-        color === CheckerType.Black ? "checker-black" : "checker-white"
+        color === CheckerColor.Black ? "checker-black" : "checker-white"
       }`}
     ></span>
   );
