@@ -1,8 +1,21 @@
 import React from "react";
 import Checker from "../checker/checker";
+import { IChecker, ICoords } from "../types/checker.type";
 
-const Cell = ({x, y, figure, board, highlited, getActiveCell, activateCell, moveFigure}) => {
-  const onCellClick = (x, y) => {
+type TCell = {
+  x: number,
+  y: number,
+  checker: IChecker
+  board: IChecker[][],
+  
+  highlited: boolean,
+  getActiveCell: () => ICoords | null,
+  activateCell: (x: number, y: number) => void,
+  moveFigure: (x: number, y: number) => void
+}
+
+const Cell = ({x, y, checker, board, highlited, getActiveCell, activateCell, moveFigure}: TCell) => {
+  const onCellClick = (x: number, y: number) => {
     const active = getActiveCell();
 
     if (active && board[y][x] === null) {
@@ -12,18 +25,12 @@ const Cell = ({x, y, figure, board, highlited, getActiveCell, activateCell, move
     }
   }
 
-  const onCheckerClick = () => {
-
-  }
-
   return <div onClick={() => onCellClick(x, y)}
   className={`item ${(x + y) % 2 === 0 ? "white" : "black"}`}>
   {
-    figure ? 
+    checker ? 
       <Checker 
-        board={board} 
-        onCheckerClick={onCheckerClick} 
-        {...figure} 
+        {...checker} 
       /> :
     highlited ? 
       <span className="highlited"></span>

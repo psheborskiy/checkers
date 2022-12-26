@@ -84,22 +84,28 @@ const BoardComponent = () => {
   };
 
   const moveFigure = (newX: number, newY: number) => {
-    const newBoardState = JSON.parse(JSON.stringify(state.board));
-    newBoardState[state.activeCell.y][state.activeCell.x] = null;
+    if (
+      state.activeCell.avaliableTurns.find(
+        (coords) => coords[0] == newX && coords[1] == newY
+      )
+    ) {
+      const newBoardState = JSON.parse(JSON.stringify(state.board));
+      newBoardState[state.activeCell.y][state.activeCell.x] = null;
 
-    newBoardState[newY][newX] = JSON.parse(
-      JSON.stringify(state.board[state.activeCell.y][state.activeCell.x])
-    );
+      newBoardState[newY][newX] = JSON.parse(
+        JSON.stringify(state.board[state.activeCell.y][state.activeCell.x])
+      );
 
-    setState({
-      ...state,
-      activeCell: {
-        x: null,
-        y: null,
-        avaliableTurns: [],
-      },
-      board: newBoardState,
-    });
+      setState({
+        ...state,
+        activeCell: {
+          x: null,
+          y: null,
+          avaliableTurns: [],
+        },
+        board: newBoardState,
+      });
+    }
   };
 
   const activateCell = (x: number, y: number) => {
@@ -169,7 +175,7 @@ const BoardComponent = () => {
                     key={"" + xindex + yindex}
                     x={xindex}
                     y={yindex}
-                    figure={figure}
+                    checker={figure}
                     board={state.board}
                     highlited={state.activeCell.avaliableTurns.find(
                       (coords) => coords[0] == xindex && coords[1] == yindex

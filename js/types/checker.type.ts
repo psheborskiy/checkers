@@ -4,6 +4,10 @@ export enum CheckerType {
 }
 
 export interface IChecker {
-  color: CheckerType,
-  // type: String
+  color: CheckerType
+}
+
+export interface ICoords {
+  x: number
+  y: number
 }
