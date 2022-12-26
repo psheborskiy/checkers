@@ -3,6 +3,8 @@ import { CheckerType, IChecker } from "../types/checker.type";
 
 type Props = {
   color: CheckerType;
+  x: number,
+  y: number,
   board: IChecker[][],
   onCheckerClick: any
 };
@@ -13,8 +15,12 @@ const Checker = ({color, board, onCheckerClick}: Props) => {
     return true;
   }
 
+  const getAvaliableMoves = () => {
+
+  }
+
   return <span 
-  onClick={onCheckerClick}
+  onClick={getAvaliableMoves}
   className={`checker ${color === CheckerType.Black ? "checker-black" : "checker-white"}`}></span>
 }
 

@@ -9,7 +9,8 @@ const BoardComponent = () => {
     turn: TurnType.Wtite,
     activeCell: {
       x: null,
-      y: null
+      y: null,
+      avaliableTurns: [],
     },
     board: [
       [
@@ -63,7 +64,7 @@ const BoardComponent = () => {
         null,
         { color: CheckerType.Wtite, y: 6, x: 5 },
         null,
-        { color: CheckerType.Wtite, y: 6, x: 7},
+        { color: CheckerType.Wtite, y: 6, x: 7 },
       ],
       [
         { color: CheckerType.Wtite, y: 7, x: 0 },
@@ -78,7 +79,7 @@ const BoardComponent = () => {
     ],
   });
 
-  const getCellFigure = (x, y) => {
+  const getCell = (x: number, y: number) => {
     return state.board[y][x];
   };
 
@@ -86,16 +87,19 @@ const BoardComponent = () => {
     const newBoardState = JSON.parse(JSON.stringify(state.board));
     newBoardState[state.activeCell.y][state.activeCell.x] = null;
 
-    newBoardState[newY][newX] = JSON.parse(JSON.stringify(state.board[state.activeCell.y][state.activeCell.x]));
+    newBoardState[newY][newX] = JSON.parse(
+      JSON.stringify(state.board[state.activeCell.y][state.activeCell.x])
+    );
 
     setState({
       ...state,
       activeCell: {
         x: null,
-        y: null
+        y: null,
+        avaliableTurns: [],
       },
-      board: newBoardState
-    })
+      board: newBoardState,
+    });
   };
 
   const activateCell = (x: number, y: number) => {
@@ -103,22 +107,53 @@ const BoardComponent = () => {
       ...state,
       activeCell: {
         x: x,
-        y: y
-      }
+        y: y,
+        avaliableTurns: showAvaliableTurns(x, y),
+      },
     });
 
     console.info(`Active cell x:${x} | y:${y}`);
-  }
+  };
 
   const getActiveCell = () => {
-    return state.activeCell.x !== null && state.activeCell.y !== null  ?
-    {x: state.activeCell.x, y: state.activeCell.y} :
-    null;
-  }
+    return state.activeCell.x !== null && state.activeCell.y !== null
+      ? { x: state.activeCell.x, y: state.activeCell.y }
+      : null;
+  };
 
-  const showAvaliableTurns = (
+  const showAvaliableTurns = (x: number, y: number): any[] => {
+    const figure = getCell(x, y);
 
-  ) => {};
+    if (figure?.color == CheckerType.Wtite) {
+      const avaliableTurns = [];
+
+      if (getCell(x - 1, y - 1) === null) {
+        avaliableTurns.push([x - 1, y - 1]);
+      }
+
+      if (getCell(x + 1, y - 1) === null) {
+        avaliableTurns.push([x + 1, y - 1]);
+      }
+
+      return avaliableTurns;
+    }
+
+    if (figure?.color == CheckerType.Black) {
+      const avaliableTurns = [];
+
+      if (getCell(x - 1, y + 1) === null) {
+        avaliableTurns.push([x - 1, y + 1]);
+      }
+
+      if (getCell(x + 1, y + 1) === null) {
+        avaliableTurns.push([x + 1, y + 1]);
+      }
+
+      return avaliableTurns;
+    }
+
+    return [];
+  };
 
   return (
     <>
@@ -135,7 +170,10 @@ const BoardComponent = () => {
                     x={xindex}
                     y={yindex}
                     figure={figure}
-                    
+                    board={state.board}
+                    highlited={state.activeCell.avaliableTurns.find(
+                      (coords) => coords[0] == xindex && coords[1] == yindex
+                    )}
                     getActiveCell={getActiveCell}
                     activateCell={activateCell}
                     moveFigure={moveFigure}
