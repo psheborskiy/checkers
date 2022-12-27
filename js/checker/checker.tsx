@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckerColor, IChecker } from "../types/checker.type";
+import { CheckerColor } from "../types/checker.type";
 
 type Props = {
   color: CheckerColor;

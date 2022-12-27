@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { CheckerColor, CheckerType, IChecker } from "../types/checker.type";
-import { TurnType } from "../types/turn.type";
 import Cell from "./cell";
 
 const BoardComponent = () => {
   const [state, setState] = useState({
     /** White have first turn! */
-    turn: TurnType.Wtite,
+    turn: CheckerColor.White,
     activeCell: {
       x: null,
       y: null,
@@ -17,7 +16,7 @@ const BoardComponent = () => {
         null,
         { color: CheckerColor.Black, y: 0, x: 1, type: CheckerType.checker },
         null,
-        { color: CheckerColor.Black, y: 0, x: 3, type: CheckerType.checker},
+        { color: CheckerColor.Black, y: 0, x: 3, type: CheckerType.checker },
         null,
         { color: CheckerColor.Black, y: 0, x: 5, type: CheckerType.checker },
         null,
@@ -47,33 +46,33 @@ const BoardComponent = () => {
 
       [null, null, null, null, null, null, null, null],
       [
-        { color: CheckerColor.Wtite, y: 5, x: 0, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 5, x: 0, type: CheckerType.checker },
         null,
-        { color: CheckerColor.Wtite, y: 5, x: 2, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 5, x: 2, type: CheckerType.checker },
         null,
-        { color: CheckerColor.Wtite, y: 5, x: 4, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 5, x: 4, type: CheckerType.checker },
         null,
-        { color: CheckerColor.Wtite, y: 5, x: 6, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 5, x: 6, type: CheckerType.checker },
         null,
       ],
       [
         null,
-        { color: CheckerColor.Wtite, y: 6, x: 1, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 6, x: 1, type: CheckerType.checker },
         null,
-        { color: CheckerColor.Wtite, y: 6, x: 3, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 6, x: 3, type: CheckerType.checker },
         null,
-        { color: CheckerColor.Wtite, y: 6, x: 5, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 6, x: 5, type: CheckerType.checker },
         null,
-        { color: CheckerColor.Wtite, y: 6, x: 7, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 6, x: 7, type: CheckerType.checker },
       ],
       [
-        { color: CheckerColor.Wtite, y: 7, x: 0, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 7, x: 0, type: CheckerType.checker },
         null,
-        { color: CheckerColor.Wtite, y: 7, x: 2, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 7, x: 2, type: CheckerType.checker },
         null,
-        { color: CheckerColor.Wtite, y: 7, x: 4, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 7, x: 4, type: CheckerType.checker },
         null,
-        { color: CheckerColor.Wtite, y: 7, x: 6, type: CheckerType.checker },
+        { color: CheckerColor.White, y: 7, x: 6, type: CheckerType.checker },
         null,
       ],
     ],
@@ -94,16 +93,39 @@ const BoardComponent = () => {
       newBoardState[state.activeCell.y][state.activeCell.x] = null;
 
       /** if attack - remove enemy checker */
-      attackWhite(state.activeCell.x, state.activeCell.y, newX, newY, newBoardState);
-      attackBlack(state.activeCell.x, state.activeCell.y, newX, newY, newBoardState);
+      attackWhite(
+        state.activeCell.x,
+        state.activeCell.y,
+        newX,
+        newY,
+        newBoardState
+      );
+      attackBlack(
+        state.activeCell.x,
+        state.activeCell.y,
+        newX,
+        newY,
+        newBoardState
+      );
 
       /** put checker back */
       newBoardState[newY][newX] = JSON.parse(
         JSON.stringify(state.board[state.activeCell.y][state.activeCell.x])
       );
 
+      /** calculate if second attack possible */
+      const possibleAttacks = showAvaliableAttacks(state.turn, newX, newY);
+
       setState({
         ...state,
+        ...(possibleAttacks.length === 0
+          ? {
+              turn:
+                state.turn === CheckerColor.Black
+                  ? CheckerColor.White
+                  : CheckerColor.Black,
+            }
+          : {}),
         activeCell: {
           x: null,
           y: null,
@@ -114,40 +136,70 @@ const BoardComponent = () => {
     }
   };
 
-  const attackWhite = (x: number, y: number, newX: number, newY: number, boardInstance: IChecker[][]) => {
+  const attackWhite = (
+    x: number,
+    y: number,
+    newX: number,
+    newY: number,
+    boardInstance: IChecker[][]
+  ) => {
     /** white right attach */
-    if ((newX - x) == 2 && (y - newY) == 2 && getCell(x+1, y-1)?.color == CheckerColor.Black){
-      boardInstance[y-1][x+1] = null;
+    if (
+      newX - x == 2 &&
+      y - newY == 2 &&
+      getCell(x + 1, y - 1)?.color == CheckerColor.Black
+    ) {
+      boardInstance[y - 1][x + 1] = null;
     }
 
     /** white left attach */
-    if ((x - newX) == 2 && (y - newY) == 2 && getCell(x-1, y-1)?.color == CheckerColor.Black){
-     boardInstance[y-1][x-1] = null;
+    if (
+      x - newX == 2 &&
+      y - newY == 2 &&
+      getCell(x - 1, y - 1)?.color == CheckerColor.Black
+    ) {
+      boardInstance[y - 1][x - 1] = null;
     }
-  }
-  const attackBlack = (x: number, y: number, newX: number, newY: number, boardInstance: IChecker[][]) => {
+  };
+  const attackBlack = (
+    x: number,
+    y: number,
+    newX: number,
+    newY: number,
+    boardInstance: IChecker[][]
+  ) => {
     /** black right attach */
-    if ((newX - x) == 2 && (newY - y) == 2 && getCell(x+1, y+1)?.color == CheckerColor.Wtite){
-      boardInstance[y+1][x+1] = null;
+    if (
+      newX - x == 2 &&
+      newY - y == 2 &&
+      getCell(x + 1, y + 1)?.color == CheckerColor.White
+    ) {
+      boardInstance[y + 1][x + 1] = null;
     }
 
     /** black left attach */
-    if ((x - newX) == 2 && (newY - y) == 2 && getCell(x-1, y+1)?.color == CheckerColor.Wtite){
-     boardInstance[y+1][x-1] = null;
+    if (
+      x - newX == 2 &&
+      newY - y == 2 &&
+      getCell(x - 1, y + 1)?.color == CheckerColor.White
+    ) {
+      boardInstance[y + 1][x - 1] = null;
     }
-  }
+  };
 
   const activateCell = (x: number, y: number) => {
-    setState({
-      ...state,
-      activeCell: {
-        x: x,
-        y: y,
-        avaliableTurns: showAvaliableTurns(x, y),
-      },
-    });
+    if (getCell(x, y)?.color == state.turn) {
+      setState({
+        ...state,
+        activeCell: {
+          x: x,
+          y: y,
+          avaliableTurns: showAvaliableTurns(x, y),
+        },
+      });
 
-    console.info(`Active cell x:${x} | y:${y}`);
+      console.info(`Active cell x:${x} | y:${y}`);
+    }
   };
 
   const getActiveCell = () => {
@@ -159,7 +211,10 @@ const BoardComponent = () => {
   const showAvaliableTurns = (x: number, y: number): any[] => {
     const figure = getCell(x, y);
 
-    if (figure?.color == CheckerColor.Wtite && figure.type==CheckerType.checker) {
+    if (
+      figure?.color == CheckerColor.White &&
+      figure.type == CheckerType.checker
+    ) {
       const avaliableTurns = [];
 
       /** Simple turn left */
@@ -167,25 +222,20 @@ const BoardComponent = () => {
         avaliableTurns.push([x - 1, y - 1]);
       }
 
-      /** Attack turn left */
-      if (getCell(x - 2, y - 2) === null && getCell(x - 1, y - 1)?.color === CheckerColor.Black) {
-        avaliableTurns.push([x - 2, y - 2]);
-      }
-
       /** Simple turn rigth */
       if (getCell(x + 1, y - 1) === null) {
         avaliableTurns.push([x + 1, y - 1]);
       }
 
-      /** Attack turn right */
-      if (getCell(x + 2, y - 2) === null && getCell(x + 1, y - 1)?.color === CheckerColor.Black) {
-        avaliableTurns.push([x + 2, y - 2]);
-      }
+      const avaliableAttacks = showAvaliableAttacks(CheckerColor.White, x, y);
 
-      return avaliableTurns;
+      return [...avaliableTurns, ...avaliableAttacks];
     }
 
-    if (figure?.color == CheckerColor.Black && figure.type==CheckerType.checker) {
+    if (
+      figure?.color == CheckerColor.Black &&
+      figure.type == CheckerType.checker
+    ) {
       const avaliableTurns = [];
 
       /** Simple turn left */
@@ -193,25 +243,61 @@ const BoardComponent = () => {
         avaliableTurns.push([x - 1, y + 1]);
       }
 
-      /** Attack turn left */
-      if (getCell(x - 2, y + 2) === null && getCell(x - 1, y + 1)?.color === CheckerColor.Wtite) {
-        avaliableTurns.push([x - 2, y + 2]);
-      }
-
       /** Simple turn rigth */
       if (getCell(x + 1, y + 1) === null) {
         avaliableTurns.push([x + 1, y + 1]);
       }
 
-      /** Attack turn right */
-      if (getCell(x + 2, y + 2) === null && getCell(x + 1, y + 1)?.color === CheckerColor.Wtite) {
-        avaliableTurns.push([x + 2, y + 2]);
-      }
+      const avaliableAttacks = showAvaliableAttacks(CheckerColor.Black, x, y);
 
-      return avaliableTurns;
+      return [...avaliableTurns, ...avaliableAttacks];
     }
 
     return [];
+  };
+
+  const showAvaliableAttacks = (
+    checker: CheckerColor,
+    x: number,
+    y: number
+  ): any[] => {
+    const avaliableAttacks = [];
+
+    if (checker === CheckerColor.White) {
+      /** Attack turn left */
+      if (
+        getCell(x - 2, y - 2) === null &&
+        getCell(x - 1, y - 1)?.color === CheckerColor.Black
+      ) {
+        avaliableAttacks.push([x - 2, y - 2]);
+      }
+
+      /** Attack turn right */
+      if (
+        getCell(x + 2, y - 2) === null &&
+        getCell(x + 1, y - 1)?.color === CheckerColor.Black
+      ) {
+        avaliableAttacks.push([x + 2, y - 2]);
+      }
+    } else {
+      /** Attack turn left */
+      if (
+        getCell(x - 2, y + 2) === null &&
+        getCell(x - 1, y + 1)?.color === CheckerColor.White
+      ) {
+        avaliableAttacks.push([x - 2, y + 2]);
+      }
+
+      /** Attack turn right */
+      if (
+        getCell(x + 2, y + 2) === null &&
+        getCell(x + 1, y + 1)?.color === CheckerColor.White
+      ) {
+        avaliableAttacks.push([x + 2, y + 2]);
+      }
+    }
+
+    return avaliableAttacks;
   };
 
   return (

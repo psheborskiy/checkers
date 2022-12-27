@@ -1,5 +1,5 @@
 export enum CheckerColor {
-  Wtite = 1,
+  White = 1,
   Black = 2
 }
 
