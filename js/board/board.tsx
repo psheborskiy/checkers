@@ -82,6 +82,12 @@ const BoardComponent = () => {
     return state.board?.[y]?.[x];
   };
 
+  const nextTurn = () => {
+    return state.turn === CheckerColor.Black
+      ? CheckerColor.White
+      : CheckerColor.Black;
+  };
+
   const moveFigure = (newX: number, newY: number) => {
     if (
       state.activeCell.avaliableTurns.find(
@@ -93,14 +99,15 @@ const BoardComponent = () => {
       newBoardState[state.activeCell.y][state.activeCell.x] = null;
 
       /** if attack - remove enemy checker */
-      attackWhite(
+      const whiteAttackSuccess = attackWhite(
         state.activeCell.x,
         state.activeCell.y,
         newX,
         newY,
         newBoardState
       );
-      attackBlack(
+
+      const blackAttackSuccess = attackBlack(
         state.activeCell.x,
         state.activeCell.y,
         newX,
@@ -115,15 +122,15 @@ const BoardComponent = () => {
 
       /** calculate if second attack possible */
       const possibleAttacks = showAvaliableAttacks(state.turn, newX, newY);
+      const canAttack =
+        possibleAttacks.length > 0 &&
+        (blackAttackSuccess || whiteAttackSuccess);
 
       setState({
         ...state,
-        ...(possibleAttacks.length === 0
+        ...(!canAttack
           ? {
-              turn:
-                state.turn === CheckerColor.Black
-                  ? CheckerColor.White
-                  : CheckerColor.Black,
+              turn: nextTurn(),
             }
           : {}),
         activeCell: {
@@ -136,13 +143,14 @@ const BoardComponent = () => {
     }
   };
 
+  /** true if attac was success */
   const attackWhite = (
     x: number,
     y: number,
     newX: number,
     newY: number,
     boardInstance: IChecker[][]
-  ) => {
+  ): boolean => {
     /** white right attach */
     if (
       newX - x == 2 &&
@@ -150,6 +158,8 @@ const BoardComponent = () => {
       getCell(x + 1, y - 1)?.color == CheckerColor.Black
     ) {
       boardInstance[y - 1][x + 1] = null;
+
+      return true;
     }
 
     /** white left attach */
@@ -159,15 +169,21 @@ const BoardComponent = () => {
       getCell(x - 1, y - 1)?.color == CheckerColor.Black
     ) {
       boardInstance[y - 1][x - 1] = null;
+
+      return true;
     }
+
+    return false;
   };
+
+  /** true if attac was success */
   const attackBlack = (
     x: number,
     y: number,
     newX: number,
     newY: number,
     boardInstance: IChecker[][]
-  ) => {
+  ): boolean => {
     /** black right attach */
     if (
       newX - x == 2 &&
@@ -175,6 +191,8 @@ const BoardComponent = () => {
       getCell(x + 1, y + 1)?.color == CheckerColor.White
     ) {
       boardInstance[y + 1][x + 1] = null;
+
+      return true;
     }
 
     /** black left attach */
@@ -184,7 +202,11 @@ const BoardComponent = () => {
       getCell(x - 1, y + 1)?.color == CheckerColor.White
     ) {
       boardInstance[y + 1][x - 1] = null;
+
+      return true;
     }
+
+    return false;
   };
 
   const activateCell = (x: number, y: number) => {
@@ -300,10 +322,35 @@ const BoardComponent = () => {
     return avaliableAttacks;
   };
 
+  const getScore = (type: CheckerColor) => {
+    let figures = 0;
+
+    for (let i = 0; i < state.board.length; i++)
+      for (let j = 0; j < state.board[i].length; j++) {
+        if (state.board?.[j]?.[i]?.color === type) {
+          ++figures;
+        }
+      }
+
+    return Math.abs(figures - 12);
+  };
+
   return (
     <>
-      <h1>Simple checkers game</h1>
-      <div className="board">
+      <section className="status">
+        <div className="score">
+          <div className="score-item">
+            Black: {getScore(CheckerColor.Black)} | White:{" "}
+            {getScore(CheckerColor.White)}
+          </div>
+        </div>
+        <div className="turn">
+          <b>
+            Turn: <i>{state.turn === CheckerColor.Black ? "black" : "white"}</i>
+          </b>
+        </div>
+      </section>
+      <section className="board">
         {state.board.map((y, yindex) => {
           return (
             <React.Fragment key={yindex + "col"}>
@@ -331,7 +378,7 @@ const BoardComponent = () => {
         {["", "a", "b", "c", "d", "e", "f", "g", "h"].map((letter) => (
           <div key={letter + 100}>{letter}</div>
         ))}
-      </div>
+      </section>
     </>
   );
 };
